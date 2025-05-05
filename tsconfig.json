@@ -1,0 +1,10 @@
+{
+  "compilerOptions": {
+    "target": "ES2024",
+    "module": "CommonJS",
+    "lib": ["ES2024"],
+    "esModuleInterop": true,
+    "strict": true,
+    "outDir": "./dist"
+  }
+}
