@@ -1,12 +1,9 @@
 import { Request, Response, Router } from "express";
-import { z } from "zod";
 import prisma from "../db/db.config";
 import { handleCatchError, handleTryResponseHandler } from "../utils/helper";
 import { TaskValidation } from "../validations/tasks.validation";
 
 const tasksRouter: Router = Router();
-
-type TaskData = z.infer<typeof TaskValidation>;
 
 tasksRouter.post("/create", async (req: Request, res: Response) => {
   try {
