@@ -20,9 +20,34 @@ UserRouter.post("/new", async (req: Request, res: Response) => {
       },
     });
 
-    if (existingUser) {
+    if (!existingUser) {
       return handleTryResponseHandler(res, 400, "Username Already Taken");
     }
+
+    // Check If Existing User Info is correct or not if not correct then already taken or incorrect details error
+
+    const validAccessCode = bcrypt.compareSync(
+      payload.accessCode,
+      existingUser.accessCode
+    );
+
+    if (!validAccessCode) {
+      return handleTryResponseHandler(
+        res,
+        400,
+        "Incorrect Username or Access Code"
+      );
+    }
+
+    const data = {
+      username,
+    };
+
+    if (existingUser && validAccessCode) {
+      return handleTryResponseHandler(res, 200, "Account Logged In", data);
+    }
+
+    // If not exist then create new user below
 
     const salt = bcrypt.genSaltSync(16);
 
@@ -35,12 +60,12 @@ UserRouter.post("/new", async (req: Request, res: Response) => {
       },
     });
 
-    return handleTryResponseHandler(res, 201, "User Created Success");
+    return handleTryResponseHandler(res, 200, "User Created Success");
   } catch (error) {
     return handleCatchError(
       error,
       res,
-      "An Error Occureed while creating USer"
+      "An Error Occureed while creating User"
     );
   }
 });
@@ -135,7 +160,7 @@ UserRouter.delete("/delete", async (req: Request, res: Response) => {
     });
 
     if (!user) {
-      return handleTryResponseHandler(res, 404, "User not found");
+      return handleTryResponseHandler(res, 400, "User not found");
     }
 
     const isAccessCodeValid = bcrypt.compareSync(
@@ -143,7 +168,7 @@ UserRouter.delete("/delete", async (req: Request, res: Response) => {
       user.accessCode
     );
     if (!isAccessCodeValid) {
-      return handleTryResponseHandler(res, 401, "Incorrect access code");
+      return handleTryResponseHandler(res, 400, "Incorrect access code");
     }
 
     await prisma.user.delete({

@@ -4,7 +4,7 @@ const StatusEnum = z.enum(["TODO", "IN_PROGRESS", "COMPLETED"]);
 const PriorityEnum = z.enum(["LOW", "NORMAL", "HIGH"]);
 
 export const TaskValidation = z.object({
-  username: z.string().min(6, { message: "Username is required" }),
+  username: z.string().min(5, { message: "Username is required" }),
   title: z
     .string()
     .min(6, "Title is required")

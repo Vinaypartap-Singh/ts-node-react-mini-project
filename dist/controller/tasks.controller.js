@@ -13,6 +13,15 @@ tasksRouter.post("/create", async (req, res) => {
         const body = req.body;
         const payload = tasks_validation_1.TaskValidation.parse(body);
         const username = payload.username.replace(" ", "-").toLowerCase();
+        console.log(payload);
+        const user = await db_config_1.default.user.findUnique({
+            where: {
+                username,
+            },
+        });
+        if (!user) {
+            return (0, helper_1.handleTryResponseHandler)(res, 400, "User Not Found");
+        }
         const newTask = await db_config_1.default.task.create({
             data: {
                 username: username,

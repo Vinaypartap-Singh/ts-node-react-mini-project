@@ -18,9 +18,21 @@ UserRouter.post("/new", async (req, res) => {
                 username: username,
             },
         });
-        if (existingUser) {
+        if (!existingUser) {
             return (0, helper_1.handleTryResponseHandler)(res, 400, "Username Already Taken");
         }
+        // Check If Existing User Info is correct or not if not correct then already taken or incorrect details error
+        const validAccessCode = bcryptjs_1.default.compareSync(payload.accessCode, existingUser.accessCode);
+        if (!validAccessCode) {
+            return (0, helper_1.handleTryResponseHandler)(res, 400, "Incorrect Username or Access Code");
+        }
+        const data = {
+            username,
+        };
+        if (existingUser && validAccessCode) {
+            return (0, helper_1.handleTryResponseHandler)(res, 200, "Account Logged In", data);
+        }
+        // If not exist then create new user below
         const salt = bcryptjs_1.default.genSaltSync(16);
         const hashedCode = bcryptjs_1.default.hashSync(payload.accessCode, salt);
         await db_config_1.default.user.create({
@@ -29,10 +41,10 @@ UserRouter.post("/new", async (req, res) => {
                 accessCode: hashedCode,
             },
         });
-        return (0, helper_1.handleTryResponseHandler)(res, 201, "User Created Success");
+        return (0, helper_1.handleTryResponseHandler)(res, 200, "User Created Success");
     }
     catch (error) {
-        return (0, helper_1.handleCatchError)(error, res, "An Error Occureed while creating USer");
+        return (0, helper_1.handleCatchError)(error, res, "An Error Occureed while creating User");
     }
 });
 UserRouter.put("/update/:username", async (req, res) => {
@@ -98,11 +110,11 @@ UserRouter.delete("/delete", async (req, res) => {
             },
         });
         if (!user) {
-            return (0, helper_1.handleTryResponseHandler)(res, 404, "User not found");
+            return (0, helper_1.handleTryResponseHandler)(res, 400, "User not found");
         }
         const isAccessCodeValid = bcryptjs_1.default.compareSync(payload.accessCode, user.accessCode);
         if (!isAccessCodeValid) {
-            return (0, helper_1.handleTryResponseHandler)(res, 401, "Incorrect access code");
+            return (0, helper_1.handleTryResponseHandler)(res, 400, "Incorrect access code");
         }
         await db_config_1.default.user.delete({
             where: {

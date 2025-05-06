@@ -17,12 +17,26 @@ tasksRouter.post("/create", async (req: Request, res: Response) => {
 
     const username = payload.username.replace(" ", "-").toLowerCase();
 
+    console.log(payload);
+
+    const user = await prisma.user.findUnique({
+      where: {
+        username,
+      },
+    });
+
+    if (!user) {
+      return handleTryResponseHandler(res, 400, "User Not Found");
+    }
+
     const newTask = await prisma.task.create({
       data: {
         username: username,
         title: payload.title,
         description: payload.description,
         dueDate: payload.dueDate,
+        priority: payload.priority,
+        status: payload.status,
       },
     });
 
@@ -41,7 +55,7 @@ tasksRouter.post("/create", async (req: Request, res: Response) => {
   }
 });
 
-tasksRouter.put("update", async (req: Request, res: Response) => {
+tasksRouter.put("/update", async (req: Request, res: Response) => {
   try {
     const payload = TaskUpdateValidation.parse(req.body);
 
@@ -110,6 +124,12 @@ tasksRouter.get("/list/:username", async (req: Request, res: Response) => {
     const tasks = await prisma.task.findMany({
       where: {
         username: formattedUsername,
+        status: {
+          in: ["IN_PROGRESS", "TODO"],
+        },
+      },
+      orderBy: {
+        createdAt: "desc",
       },
     });
 
