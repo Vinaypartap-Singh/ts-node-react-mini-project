@@ -124,12 +124,9 @@ tasksRouter.get("/list/:username", async (req: Request, res: Response) => {
     const tasks = await prisma.task.findMany({
       where: {
         username: formattedUsername,
-        status: {
-          in: ["IN_PROGRESS", "TODO"],
-        },
       },
       orderBy: {
-        createdAt: "desc",
+        status: "asc",
       },
     });
 
