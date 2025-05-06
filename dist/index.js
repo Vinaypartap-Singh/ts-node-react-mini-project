@@ -36,6 +36,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const cors_1 = __importDefault(require("cors"));
 const express_1 = __importStar(require("express"));
 const routes_1 = __importDefault(require("./routes"));
 const app = (0, express_1.default)();
@@ -43,6 +44,8 @@ const PORT = process.env.PORT || 3000;
 // middlwares
 app.use(express_1.default.json());
 app.use((0, express_1.urlencoded)({ extended: false }));
+// Cors
+app.use((0, cors_1.default)());
 // Routes Middleware
 app.use(routes_1.default);
 app.get("/", (req, res) => {

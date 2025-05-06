@@ -1,3 +1,4 @@
+import cors from "cors";
 import express, { Express, Request, Response, urlencoded } from "express";
 import routeHandler from "./routes";
 
@@ -7,6 +8,9 @@ const PORT = process.env.PORT || 3000;
 // middlwares
 app.use(express.json());
 app.use(urlencoded({ extended: false }));
+
+// Cors
+app.use(cors());
 
 // Routes Middleware
 app.use(routeHandler);
