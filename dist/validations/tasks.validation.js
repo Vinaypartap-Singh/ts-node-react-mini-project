@@ -5,7 +5,7 @@ const zod_1 = require("zod");
 const StatusEnum = zod_1.z.enum(["TODO", "IN_PROGRESS", "COMPLETED"]);
 const PriorityEnum = zod_1.z.enum(["LOW", "NORMAL", "HIGH"]);
 exports.TaskValidation = zod_1.z.object({
-    username: zod_1.z.string().min(6, { message: "Username is required" }),
+    username: zod_1.z.string().min(5, { message: "Username is required" }),
     title: zod_1.z
         .string()
         .min(6, "Title is required")

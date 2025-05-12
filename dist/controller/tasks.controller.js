@@ -28,6 +28,8 @@ tasksRouter.post("/create", async (req, res) => {
                 title: payload.title,
                 description: payload.description,
                 dueDate: payload.dueDate,
+                priority: payload.priority,
+                status: payload.status,
             },
         });
         return (0, helper_1.handleTryResponseHandler)(res, 200, "Task Created Successfully", newTask);
@@ -36,7 +38,7 @@ tasksRouter.post("/create", async (req, res) => {
         return (0, helper_1.handleCatchError)(error, res, "An Error Occurred While Creating Task");
     }
 });
-tasksRouter.put("update", async (req, res) => {
+tasksRouter.put("/update", async (req, res) => {
     try {
         const payload = tasks_validation_1.TaskUpdateValidation.parse(req.body);
         const getTask = await db_config_1.default.task.findUnique({
@@ -76,7 +78,7 @@ tasksRouter.delete("/delete", async (req, res) => {
         if (!task) {
             return (0, helper_1.handleTryResponseHandler)(res, 400, "Not Found");
         }
-        await db_config_1.default.user.delete({
+        await db_config_1.default.task.delete({
             where: {
                 id: payload.taskId,
             },
@@ -96,6 +98,9 @@ tasksRouter.get("/list/:username", async (req, res) => {
         const tasks = await db_config_1.default.task.findMany({
             where: {
                 username: formattedUsername,
+            },
+            orderBy: {
+                status: "asc",
             },
         });
         return (0, helper_1.handleTryResponseHandler)(res, 200, "Tasks", tasks);

@@ -38,17 +38,31 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const cors_1 = __importDefault(require("cors"));
 const express_1 = __importStar(require("express"));
+const http_1 = __importDefault(require("http"));
+const socket_io_1 = require("socket.io");
 const routes_1 = __importDefault(require("./routes"));
-const app = (0, express_1.default)();
 const PORT = process.env.PORT || 3000;
+const app = (0, express_1.default)();
+const server = http_1.default.createServer(app);
+const io = new socket_io_1.Server(server, {
+    cors: {
+        origin: "http://localhost:5173",
+        methods: ["GET", "POST", "PUT", "DELETE"],
+        credentials: true,
+    },
+});
+// Socket io in app instance
+app.io = io;
 // middlwares
 app.use(express_1.default.json());
 app.use((0, express_1.urlencoded)({ extended: false }));
 // Cors
-app.use((0, cors_1.default)());
+app.use((0, cors_1.default)({
+    origin: ["http://localhost:5173"],
+}));
 // Routes Middleware
 app.use(routes_1.default);
 app.get("/", (req, res) => {
     res.json({ message: "Hello World" });
 });
-app.listen(PORT, () => console.log(`Server is running on ${PORT}`));
+server.listen(PORT, () => console.log(`Server is running on ${PORT}`));

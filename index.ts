@@ -7,9 +7,11 @@ import routeHandler from "./routes";
 const PORT = process.env.PORT || 3000;
 const app: Express = express();
 const server = http.createServer(app);
-const io = new SocketIOServer({
+const io = new SocketIOServer(server, {
   cors: {
-    origin: "*",
+    origin: "http://localhost:5173",
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    credentials: true,
   },
 });
 
@@ -22,7 +24,11 @@ app.use(express.json());
 app.use(urlencoded({ extended: false }));
 
 // Cors
-app.use(cors());
+app.use(
+  cors({
+    origin: ["http://localhost:5173"],
+  })
+);
 
 // Routes Middleware
 app.use(routeHandler);
