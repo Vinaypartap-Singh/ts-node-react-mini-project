@@ -102,7 +102,7 @@ tasksRouter.delete("/delete", async (req: Request, res: Response) => {
       return handleTryResponseHandler(res, 400, "Not Found");
     }
 
-    await prisma.user.delete({
+    await prisma.task.delete({
       where: {
         id: payload.taskId,
       },

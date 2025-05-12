@@ -21,6 +21,10 @@ thoughtRouter.post("/create", async (req: Request, res: Response) => {
       },
     });
 
+    const socket = req.app.io;
+
+    socket?.emit("thought_created", newThought);
+
     return handleTryResponseHandler(
       res,
       200,
@@ -40,7 +44,7 @@ thoughtRouter.put("/update", async (req: Request, res: Response) => {
   try {
     const payload = ThoughtUpdateValidation.parse(req.body);
 
-    const getThought = await prisma.task.findUnique({
+    const getThought = await prisma.thoughts.findUnique({
       where: {
         id: payload.thoughtId,
       },
@@ -50,7 +54,7 @@ thoughtRouter.put("/update", async (req: Request, res: Response) => {
       return handleTryResponseHandler(res, 400, "Task Not Found");
     }
 
-    await prisma.thoughts.update({
+    const updatedThoughts = await prisma.thoughts.update({
       where: {
         id: payload.thoughtId,
       },
@@ -59,6 +63,9 @@ thoughtRouter.put("/update", async (req: Request, res: Response) => {
         content: payload.content,
       },
     });
+
+    const socket = req.app.io;
+    socket?.emit("thought_updated", updatedThoughts);
 
     return handleTryResponseHandler(res, 200, "Task Updated");
   } catch (error) {
@@ -70,7 +77,7 @@ thoughtRouter.delete("/delete", async (req: Request, res: Response) => {
   try {
     const payload = ThoughtDeleteValidation.parse(req.body);
 
-    const task = await prisma.task.findUnique({
+    const task = await prisma.thoughts.findUnique({
       where: {
         id: payload.thoughtId,
       },
@@ -80,13 +87,16 @@ thoughtRouter.delete("/delete", async (req: Request, res: Response) => {
       return handleTryResponseHandler(res, 400, "Not Found");
     }
 
-    await prisma.user.delete({
+    const deletedThoughts = await prisma.thoughts.delete({
       where: {
         id: payload.thoughtId,
       },
     });
 
-    return handleTryResponseHandler(res, 200, "Task Deleted");
+    const socket = req.app.io;
+    socket?.emit("thought_deleted", deletedThoughts);
+
+    return handleTryResponseHandler(res, 200, "Thought Deleted");
   } catch (error) {
     return handleCatchError(error, res, "Error while deleting tasks");
   }
